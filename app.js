@@ -37,7 +37,11 @@ d3.queue()
       .enter()
       .append('path')
       .classed('country', true)
-      .attr('d', path);
+      .attr('d', path)
+      .on('mousemove', showToolTip)
+      .on('touchStart', showToolTip)
+      .on('mouseout', hideToolTip)
+      .on('touchEnd', hideToolTip);
 
     var select = d3.select('select');
 
@@ -45,6 +49,7 @@ d3.queue()
       .on('change', d => setColor(d3.event.target.value));
 
     setColor(select.property('value'));
+
 
     function setColor(val) {
       var colorRanges = {
@@ -68,3 +73,27 @@ d3.queue()
         });
     }
   });
+
+var tooltip = d3.select('body')
+  .append('div')
+  .classed('tooltip', true);
+
+function showToolTip(d) {
+  var properties = d.properties;
+  tooltip
+    .style('opacity', 1)
+    .style('left', d3.event.x - (tooltip.node().offsetWidth /2) + 'px')
+    .style('top', d3.event.y + 25 + 'px')
+    .html(`
+        <p>${properties.country}</p>
+        <p>Population: ${properties.population.toLocaleString()}</p>
+        <p>Population Density: ${properties.populationDensity.toFixed(2)} per km2</p>
+        <p>Median Age: ${properties.medianAge}</p>
+        <p>Fertility Rate: ${properties.fertilityRate}%</p>
+      `);  
+}
+  
+function hideToolTip() {
+  tooltip
+    .style('opacity', 0);
+}
